@@ -188,20 +188,26 @@ export default function App() {
       {
         company: "Tech4Youth: The Dominican Computer Society",
         position: "Vice President - Internal Affairs",
-        period: "Sept 2021 - June 2022",
+        period: "2021 - 2022",
         description: "Openly helped the organization to achieve new heights by introducing new events and activities and helping other organizations with technical events."
       },
       {
-        company: "Digital Forge",
-        position: "Backend Developer",
-        period: "2021 — 2023",
-        description: "Managed complex database schemas and built scalable API endpoints using Node.js and Rust. Optimized query performance by 40%."
+        company: "Tech4Youth: The Dominican Computer Society",
+        position: "President - Internal Affairs",
+        period: "2022 - 2023",
+        description: "Led cross-function student teams to organize technical events, increasing participation to the student body. Coordinated with external organizations for collaborative tech workshops and competitions. Oversaw planning, execution, and post-event evaluation for multiple campus-wide events."
       },
       {
-        company: "CloudCore",
-        position: "Platform Engineer",
-        period: "2019 — 2021",
-        description: "Implemented CI/CD pipelines and managed Kubernetes clusters for high-traffic applications."
+        company: "CREOTEC Philippines Inc. ",
+        position: "Team Leader - Work Immersion Program",
+        period: "2023 - 2023",
+        description: "Assisted in organizing and facilitating robotics and coding programs, supporting fellow students and improving technical engagement during work immersion."
+      },
+      {
+        company: "DLSU-D College of Information and Computer Studies Student Government",
+        position: "Technical and Documentation Committee Member",
+        period: "2023 - 2025",
+        description: "Assisted in facilitating photographic documentation on university-wide events, capturing important moments and highlights of events Oversaw photographic documentation, execution, and post-event editing of images for multiple campus-wide events."
       }
     ],
     skills: [
