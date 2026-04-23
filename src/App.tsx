@@ -182,8 +182,8 @@ export default function App() {
   }, [isDarkMode]);
 
   const cvData: CVData = {
-    name: "Lorenz V.",
-    role: "SYSTEMS ARCHITECT & DEVELOPER",
+    name: "Lorenz Liu Leovonchiong",
+    role: "SOFTWARE ENGINEER - DATA ANALYST",
     experience: [
       {
         company: "CodeNexus Systems",
