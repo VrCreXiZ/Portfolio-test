@@ -186,10 +186,10 @@ export default function App() {
     role: "SOFTWARE ENGINEER - DATA ANALYST",
     experience: [
       {
-        company: "CodeNexus Systems",
-        position: "Senior Software Engineer",
-        period: "2023 — Present",
-        description: "Leading development of high-performance React architectures and robust security protocols. Architecting scalable microservices and infrastructure."
+        company: "Tech4Youth: The Dominican Computer Society",
+        position: "Vice President - Internal Affairs",
+        period: "Sept 2021 - June 2022",
+        description: "Openly helped the organization to achieve new heights by introducing new events and activities and helping other organizations with technical events."
       },
       {
         company: "Digital Forge",
