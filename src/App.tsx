@@ -292,7 +292,7 @@ export default function App() {
         <section id="experience" className="space-y-24 pt-32">
           <div className="space-y-4">
             <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
-            <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">PREVIOUS_STACKS</div>
+            <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">WORK EXPERIENCE</div>
           </div>
 
           <div className="grid grid-cols-1 gap-32">
