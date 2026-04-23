@@ -227,9 +227,9 @@ export default function App() {
     ],
     education: [
       {
-        institution: "Stanford Institute of Technology",
-        degree: "B.S. Computer Science",
-        year: "Class of 2018"
+        institution: "De La Salle University - Dasmariñas",
+        degree: "Bachelor of Science in Computer Science - Specialization in Intelligent Systems",
+        year: "Class of 2027"
       }
     ]
   };
