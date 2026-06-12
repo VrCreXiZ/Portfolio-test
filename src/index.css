@@ -19,6 +19,19 @@
   }
 }
 
+/* Ensure these headings become pure black in light mode and white in dark mode */
+.light .theme-heading-experience,
+.light .theme-heading-architecture,
+.light .theme-heading-commence {
+  color: #000000;
+}
+
+.dark .theme-heading-experience,
+.dark .theme-heading-architecture,
+.dark .theme-heading-commence {
+  color: #ffffff;
+}
+
 @layer utilities {
   .blackboard-texture {
     background-image: 

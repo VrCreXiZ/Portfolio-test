@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, FC } from 'react';
 import { motion, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
 import { Github, Linkedin, Mail, Binary, Cpu, Database, Layout, Sun, Moon, ArrowDown } from 'lucide-react';
 
@@ -7,19 +7,115 @@ interface CVData {
   name: string;
   role: string;
   experience: { company: string; position: string; period: string; description: string }[];
-  skills: { name: string; color: string; category: string }[];
-  education: { school: string; degree: string; year: string; institution: string }[];
+  skills: { name: string; color: string; category: string; slug?: string; logoPath?: string }[];
+  education: { degree: string; year: string; institution: string }[];
 }
 
 // --- Components ---
 
-const SkillIcon = ({ skill, isDarkMode }: { skill: { name: string; color: string; slug?: string; logoPath?: string }, isDarkMode: boolean }) => {
+interface SkillIconProps {
+  skill: { name: string; color: string; category: string; slug?: string; logoPath?: string };
+  isDarkMode: boolean;
+}
+
+const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
   const [isHovered, setIsHovered] = useState(false);
+
+  const slug = skill.slug || skill.name.toLowerCase().replace('.', '');
+
+  const getCustomSvg = (colored: boolean) => {
+    const mono = isDarkMode ? '#ffffff' : '#000000';
+
+    // CSS3 + Matplotlib: monochrome by default, brand-colored on hover
+    if (slug === 'css3') {
+      const c1 = colored ? '#1572B6' : mono;
+      const c2 = colored ? '#0B5FA5' : mono;
+      const c3 = colored ? '#33A9DC' : mono;
+
+      return (
+        <svg
+          viewBox="0 0 256 256"
+          width="48"
+          height="48"
+          aria-hidden="true"
+          style={{ display: 'block' }}
+        >
+          <defs>
+            <linearGradient id="css3Grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor={c1} />
+              <stop offset="1" stopColor={c2} />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#css3Grad)"
+            d="M27 0l20 256 182-70L229 0H27z"
+          />
+          <path
+            fill={c3}
+            opacity={colored ? '0.95' : '0.7'}
+            d="M128 44v172l75-28-8-144H128z"
+          />
+          <path
+            fill={mono}
+            opacity={colored ? '0.92' : '0.5'}
+            d="M206 71l-86 34-6 46 77-29-2 28-61 23-2 13h-18l6-58 71-28 2-18-53 20-2-18 88-34z"
+          />
+        </svg>
+      );
+    }
+
+    if (slug === 'matplotlib') {
+      const b1 = colored ? '#4F84C4' : mono;
+      const b2 = colored ? '#1F77B4' : mono;
+      const b3 = colored ? '#155E8A' : mono;
+      const stroke = colored ? '#6AAED6' : mono;
+      const fillLine = colored ? '#A6D8F2' : mono;
+
+      return (
+        <svg
+          viewBox="0 0 256 256"
+          width="48"
+          height="48"
+          aria-hidden="true"
+          style={{ display: 'block' }}
+        >
+          {/* Matplotlib "bar chart" style */}
+          <rect
+            x="24"
+            y="176"
+            width="208"
+            height="24"
+            rx="8"
+            fill={mono}
+            opacity={colored ? '0.15' : '0.35'}
+          />
+          <circle cx="80" cy="136" r="22" fill={b1} opacity={colored ? '1' : '0.8'} />
+          <rect x="118" y="88" width="18" height="96" rx="6" fill={b1} opacity={colored ? '1' : '0.8'} />
+          <rect x="144" y="118" width="18" height="66" rx="6" fill={b2} opacity={colored ? '1' : '0.8'} />
+          <rect x="170" y="68" width="18" height="116" rx="6" fill={b3} opacity={colored ? '1' : '0.8'} />
+          <path
+            d="M44 188V56c0-8 6-14 14-14h140c8 0 14 6 14 14v132"
+            fill="none"
+            stroke={stroke}
+            strokeWidth="10"
+            strokeLinecap="round"
+            opacity={colored ? '0.9' : '0.6'}
+          />
+          <path
+            d="M72 140l32-56 24 40 34-58 18 6-44 74-26-44-30 52-8-14z"
+            fill={fillLine}
+            opacity={colored ? '0.9' : '0.6'}
+          />
+        </svg>
+      );
+    }
+
+    return null;
+  };
 
   const getLogoUrl = (type: 'base' | 'hover') => {
     if (skill.logoPath) return skill.logoPath;
-    
-    const slug = skill.slug || skill.name.toLowerCase().replace('.', '');
+
     if (type === 'base') {
       return `https://cdn.simpleicons.org/${slug}/${isDarkMode ? 'ffffff' : '000000'}`;
     }
@@ -33,31 +129,52 @@ const SkillIcon = ({ skill, isDarkMode }: { skill: { name: string; color: string
       whileHover={{ scale: 1.15 }}
       className="relative flex flex-col items-center justify-center group"
     >
-      <div className={`w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-3xl border transition-all duration-500 relative overflow-hidden
-        ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/5 bg-black/[0.02]'}
+        <div className={`w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-3xl border transition-all duration-500 relative overflow-hidden
+        ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/10 bg-black/[0.03]'}
       `}
-      style={{
-        borderColor: isHovered ? skill.color + '44' : undefined,
-        backgroundColor: isHovered ? skill.color + '08' : undefined,
-        boxShadow: isHovered ? `0 0 40px ${skill.color}11` : 'none'
-      }}
+        style={{
+          borderColor: isHovered ? skill.color + '44' : undefined,
+          backgroundColor: isHovered ? skill.color + '08' : undefined,
+          boxShadow: isHovered ? `0 0 40px ${skill.color}11` : 'none'
+        }}
       >
         {/* Base State Icon */}
-        <img 
-          src={getLogoUrl('base')}
-          alt={skill.name}
-          className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none absolute object-contain
-            ${isHovered ? 'opacity-0 scale-75' : 'opacity-[0.25] grayscale lg:opacity-[0.2]'}
-          `}
-        />
+        {getCustomSvg(false) ? (
+          <div
+            className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none absolute object-contain
+              ${isHovered ? 'opacity-0 scale-75' : isDarkMode ? 'opacity-[0.25] grayscale lg:opacity-[0.2]' : 'opacity-100 grayscale-0'}
+            `}
+          >
+            {getCustomSvg(false)}
+          </div>
+        ) : (
+          <img
+            src={getLogoUrl('base')}
+            alt={skill.name}
+            className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none absolute object-contain
+              ${isHovered ? 'opacity-0 scale-75' : isDarkMode ? 'opacity-[0.25] grayscale lg:opacity-[0.2]' : 'opacity-100 grayscale-0'}
+            `}
+          />
+        )}
+
         {/* Hovered State Icon */}
-        <img 
-          src={getLogoUrl('hover')}
-          alt={skill.name}
-          className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none object-contain
-            ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-50 absolute'}
-          `}
-        />
+        {getCustomSvg(false) ? (
+          <div
+            className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none object-contain
+              ${isHovered ? 'opacity-100 scale-100' : isDarkMode ? 'opacity-0 scale-50 absolute' : 'opacity-0 scale-50 absolute'}
+            `}
+          >
+            {getCustomSvg(true)}
+          </div>
+        ) : (
+          <img
+            src={getLogoUrl('hover')}
+            alt={skill.name}
+            className={`w-10 h-10 md:w-12 md:h-12 transition-all duration-500 pointer-events-none object-contain
+              ${isHovered ? 'opacity-100 scale-100' : isDarkMode ? 'opacity-0 scale-50 absolute' : 'opacity-0 scale-50 absolute'}
+            `}
+          />
+        )}
       </div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -75,7 +192,7 @@ const SkillIcon = ({ skill, isDarkMode }: { skill: { name: string; color: string
 const BlackboardBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   const springX = useSpring(mouseX, { damping: 40, stiffness: 80 });
   const springY = useSpring(mouseY, { damping: 40, stiffness: 80 });
 
@@ -103,13 +220,13 @@ const BlackboardBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
           y: springY,
           translateX: '-50%',
           translateY: '-50%',
-          background: isDarkMode 
+          background: isDarkMode
             ? 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)'
             : 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)',
           mixBlendMode: isDarkMode ? 'screen' : 'overlay',
         }}
       />
-      
+
       {/* Subtle Grid */}
       <div className={`absolute inset-0 grid-pattern ${isDarkMode ? 'opacity-[0.03] text-white' : 'opacity-[0.03] text-black'}`} />
 
@@ -133,7 +250,7 @@ const BinaryTypewriter = () => {
 
   const [index, setIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
-  
+
   const currentLine = lines[index];
   const characters = "010101110010101!@#$%^&*";
 
@@ -143,9 +260,9 @@ const BinaryTypewriter = () => {
 
     const animateChar = () => {
       if (charIndex <= currentLine.length) {
-        setDisplayText(currentLine.slice(0, charIndex) + 
+        setDisplayText(currentLine.slice(0, charIndex) +
           (charIndex < currentLine.length ? characters[Math.floor(Math.random() * characters.length)] : ""));
-        
+
         if (charIndex === currentLine.length) {
           timeoutId = setTimeout(() => {
             setIndex((prev) => (prev + 1) % lines.length);
@@ -243,17 +360,17 @@ export default function App() {
   return (
     <div className="relative min-h-screen font-sans">
       <BlackboardBackground isDarkMode={isDarkMode} />
-      
+
       {/* Theme Toggle & Header */}
       <header className="fixed top-0 left-0 w-full p-8 md:p-12 z-50 flex justify-between items-center mix-blend-difference">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="font-mono font-bold text-lg tracking-[0.2em] text-white uppercase"
         >
           {cvData.name}
         </motion.div>
-        <button 
+        <button
           onClick={() => setIsDarkMode(!isDarkMode)}
           className="p-3 rounded-full hover:bg-white/10 transition-all text-white border border-white/20"
         >
@@ -262,7 +379,7 @@ export default function App() {
       </header>
 
       {/* Expansive Hero Section */}
-      <section className="min-h-screen flex flex-col justify-end p-8 md:p-24 pb-32">
+      <section className="min-h-[80vh] flex flex-col justify-center p-8 md:p-24 pt-32 md:pt-48 pb-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -275,11 +392,11 @@ export default function App() {
           </div>
           <BinaryTypewriter />
           <p className="text-lg md:text-xl max-w-2xl opacity-60 font-light leading-relaxed">
-            I build resilient digital architectures where performance meets logical precision. 
+            I build resilient digital architectures where performance meets logical precision.
             Focused on bridging high-throughput backend services with refined, human-centric interfaces.
           </p>
         </motion.div>
-        
+
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
           <ArrowDown size={32} />
         </div>
@@ -287,17 +404,19 @@ export default function App() {
 
       {/* Expansive Content Sections */}
       <div className="max-w-7xl mx-auto px-8 md:px-24 space-y-48 pb-64">
-        
+
         {/* Experience Section - Far more spaced out */}
         <section id="experience" className="space-y-24 pt-32">
-          <div className="space-y-4">
-            <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
-            <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">WORK EXPERIENCE</div>
-          </div>
+            <div className="space-y-4">
+              <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
+              <div className="theme-heading-experience text-5xl md:text-8xl font-bold tracking-tighter select-none transition-opacity">
+                WORK EXPERIENCE
+              </div>
+            </div>
 
           <div className="grid grid-cols-1 gap-32">
             {cvData.experience.map((job, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -356,11 +475,13 @@ export default function App() {
           <div className="flex justify-between items-end">
             <div className="space-y-4">
               <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase">System Core</h2>
-              <div className="text-5xl md:text-9xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none uppercase transition-opacity">ARCHITECTURE</div>
+              <div className="theme-heading-architecture text-5xl md:text-9xl font-bold tracking-tighter select-none uppercase transition-opacity">
+                ARCHITECTURE
+              </div>
             </div>
             <Database size={64} className="opacity-20 hidden md:block" />
           </div>
-          
+
           <div className="flex flex-wrap items-center justify-center gap-12 md:gap-16">
             {cvData.skills.map(skill => (
               <SkillIcon key={skill.name} skill={skill} isDarkMode={isDarkMode} />
@@ -374,8 +495,8 @@ export default function App() {
       <footer className="relative border-t border-white/5 pt-32 pb-64 px-8 md:px-24 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-24">
           <div className="space-y-24">
-            <div className="text-7xl md:text-9xl font-bold tracking-tighter opacity-15 dark:opacity-10 select-none leading-none">
-              COMMENCE<br/>CONSTRUCTION
+            <div className="theme-heading-commence text-7xl md:text-9xl font-bold tracking-tighter select-none leading-none">
+              COMMENCE<br />CONSTRUCTION
             </div>
             <div className="space-y-8">
               <div className="w-12 h-1 bg-blue-500" />
