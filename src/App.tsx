@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo, FC } from 'react';
+import { useEffect, useState, useMemo, useRef, FC } from 'react';
 import { motion, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
-import { Github, Linkedin, Mail, Binary, Cpu, Database, Layout, Sun, Moon, ArrowDown } from 'lucide-react';
+import { Github, Linkedin, Mail, Binary, Cpu, Database, Layout, Sun, Moon, ArrowDown, ExternalLink, X, Grid, ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
 
 // --- Types ---
 interface CVData {
@@ -9,6 +9,7 @@ interface CVData {
   experience: { company: string; position: string; period: string; description: string }[];
   skills: { name: string; color: string; category: string; slug?: string; logoPath?: string }[];
   education: { degree: string; year: string; institution: string }[];
+  projects: { title: string; tag: string; description: string; tech: string[]; year: string; sourceUrl?: string; liveUrl?: string }[];
 }
 
 // --- Components ---
@@ -20,13 +21,11 @@ interface SkillIconProps {
 
 const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
   const [isHovered, setIsHovered] = useState(false);
-
   const slug = skill.slug || skill.name.toLowerCase().replace('.', '');
 
   const getCustomSvg = (colored: boolean) => {
     const mono = isDarkMode ? '#ffffff' : '#000000';
 
-    // CSS3 + Matplotlib: monochrome by default, brand-colored on hover
     if (slug === 'css3') {
       const c1 = colored ? '#1572B6' : mono;
       const c2 = colored ? '#0B5FA5' : mono;
@@ -38,7 +37,7 @@ const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
           width="48"
           height="48"
           aria-hidden="true"
-          style={{ display: 'block' }}
+          className="block"
         >
           <defs>
             <linearGradient id="css3Grad" x1="0" y1="0" x2="1" y2="1">
@@ -46,20 +45,9 @@ const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
               <stop offset="1" stopColor={c2} />
             </linearGradient>
           </defs>
-          <path
-            fill="url(#css3Grad)"
-            d="M27 0l20 256 182-70L229 0H27z"
-          />
-          <path
-            fill={c3}
-            opacity={colored ? '0.95' : '0.7'}
-            d="M128 44v172l75-28-8-144H128z"
-          />
-          <path
-            fill={mono}
-            opacity={colored ? '0.92' : '0.5'}
-            d="M206 71l-86 34-6 46 77-29-2 28-61 23-2 13h-18l6-58 71-28 2-18-53 20-2-18 88-34z"
-          />
+          <path fill="url(#css3Grad)" d="M27 0l20 256 182-70L229 0H27z" />
+          <path fill={c3} opacity={colored ? '0.95' : '0.7'} d="M128 44v172l75-28-8-144H128z" />
+          <path fill={mono} opacity={colored ? '0.92' : '0.5'} d="M206 71l-86 34-6 46 77-29-2 28-61 23-2 13h-18l6-58 71-28 2-18-53 20-2-18 88-34z" />
         </svg>
       );
     }
@@ -77,35 +65,15 @@ const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
           width="48"
           height="48"
           aria-hidden="true"
-          style={{ display: 'block' }}
+          className="block"
         >
-          {/* Matplotlib "bar chart" style */}
-          <rect
-            x="24"
-            y="176"
-            width="208"
-            height="24"
-            rx="8"
-            fill={mono}
-            opacity={colored ? '0.15' : '0.35'}
-          />
+          <rect x="24" y="176" width="208" height="24" rx="8" fill={mono} opacity={colored ? '0.15' : '0.35'} />
           <circle cx="80" cy="136" r="22" fill={b1} opacity={colored ? '1' : '0.8'} />
           <rect x="118" y="88" width="18" height="96" rx="6" fill={b1} opacity={colored ? '1' : '0.8'} />
           <rect x="144" y="118" width="18" height="66" rx="6" fill={b2} opacity={colored ? '1' : '0.8'} />
           <rect x="170" y="68" width="18" height="116" rx="6" fill={b3} opacity={colored ? '1' : '0.8'} />
-          <path
-            d="M44 188V56c0-8 6-14 14-14h140c8 0 14 6 14 14v132"
-            fill="none"
-            stroke={stroke}
-            strokeWidth="10"
-            strokeLinecap="round"
-            opacity={colored ? '0.9' : '0.6'}
-          />
-          <path
-            d="M72 140l32-56 24 40 34-58 18 6-44 74-26-44-30 52-8-14z"
-            fill={fillLine}
-            opacity={colored ? '0.9' : '0.6'}
-          />
+          <path d="M44 188V56c0-8 6-14 14-14h140c8 0 14 6 14 14v132" fill="none" stroke={stroke} strokeWidth="10" strokeLinecap="round" opacity={colored ? '0.9' : '0.6'} />
+          <path d="M72 140l32-56 24 40 34-58 18 6-44 74-26-44-30 52-8-14z" fill={fillLine} opacity={colored ? '0.9' : '0.6'} />
         </svg>
       );
     }
@@ -129,9 +97,10 @@ const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
       whileHover={{ scale: 1.15 }}
       className="relative flex flex-col items-center justify-center group"
     >
-        <div className={`w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-3xl border transition-all duration-500 relative overflow-hidden
-        ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/10 bg-black/[0.03]'}
-      `}
+      <div
+        className={`w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-3xl border transition-all duration-500 relative overflow-hidden
+          ${isDarkMode ? 'border-white/5 bg-white/[0.02]' : 'border-black/5 bg-black/[0.02]'}
+        `}
         style={{
           borderColor: isHovered ? skill.color + '44' : undefined,
           backgroundColor: isHovered ? skill.color + '08' : undefined,
@@ -189,10 +158,99 @@ const SkillIcon: FC<SkillIconProps> = ({ skill, isDarkMode }) => {
   );
 };
 
+interface ProjectCardProps {
+  project: {
+    title: string;
+    tag: string;
+    description: string;
+    tech: string[];
+    year: string;
+    sourceUrl?: string;
+    liveUrl?: string;
+  };
+  isDarkMode: boolean;
+  onClick: () => void;
+  isCarousel?: boolean;
+}
+
+const ProjectCard: FC<ProjectCardProps> = ({ project, isDarkMode, onClick, isCarousel = false }) => {
+  return (
+    <motion.div
+      onClick={onClick}
+      whileHover={{ y: -8 }}
+      className={`p-8 md:p-10 rounded-3xl border transition-all duration-300 flex flex-col justify-between backdrop-blur-sm relative overflow-hidden group cursor-pointer project-glow-effect
+        ${isCarousel 
+          ? 'w-[290px] sm:w-[340px] md:w-[380px] shrink-0' 
+          : 'w-full'
+        }
+        ${isDarkMode 
+          ? 'border-white/5 bg-white/[0.015] hover:border-blue-500/30 hover:bg-white/[0.03] shadow-2xl shadow-black/40' 
+          : 'border-black/5 bg-black/[0.01] hover:border-blue-500/30 hover:bg-black/[0.02] shadow-2xl shadow-slate-200/50'
+        }
+      `}
+    >
+      <div className="space-y-6">
+        <div className="flex justify-between items-start gap-2">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-mono tracking-[0.3em] text-blue-500 uppercase font-extrabold">{project.tag}</span>
+            <h3 className="text-2xl md:text-3xl font-bold tracking-tight group-hover:text-blue-500 transition-colors">{project.title}</h3>
+          </div>
+          <span className="text-xs font-mono opacity-40 shrink-0">{project.year}</span>
+        </div>
+        <p className="text-sm opacity-60 font-light leading-relaxed">
+          {project.description}
+        </p>
+        <div className="flex flex-wrap gap-2 pt-2">
+          {project.tech.map((t: string) => (
+            <span key={t} className={`text-[10px] font-mono px-3 py-1 rounded-full border
+              ${isDarkMode 
+                ? 'bg-white/5 border-white/5 text-white/55' 
+                : 'bg-black/5 border-black/5 text-black/65'
+              }
+            `}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+      
+      <div className="flex justify-between items-center pt-8 mt-8 border-t border-current/5">
+        <div className="flex gap-6">
+          {project.sourceUrl && (
+            <a 
+              href={project.sourceUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 text-xs font-mono text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider font-semibold"
+            >
+              <Github size={14} /> Source Code
+            </a>
+          )}
+          {project.liveUrl && (
+            <a 
+              href={project.liveUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 text-xs font-mono text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider font-semibold"
+            >
+              <ExternalLink size={14} /> Live
+            </a>
+          )}
+        </div>
+        <span className="text-[10px] font-mono text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-extrabold tracking-wider">
+          MORE SPECS →
+        </span>
+      </div>
+    </motion.div>
+  );
+};
+
 const BlackboardBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
+  
   const springX = useSpring(mouseX, { damping: 40, stiffness: 80 });
   const springY = useSpring(mouseY, { damping: 40, stiffness: 80 });
 
@@ -220,13 +278,13 @@ const BlackboardBackground = ({ isDarkMode }: { isDarkMode: boolean }) => {
           y: springY,
           translateX: '-50%',
           translateY: '-50%',
-          background: isDarkMode
+          background: isDarkMode 
             ? 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)'
             : 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)',
           mixBlendMode: isDarkMode ? 'screen' : 'overlay',
         }}
       />
-
+      
       {/* Subtle Grid */}
       <div className={`absolute inset-0 grid-pattern ${isDarkMode ? 'opacity-[0.03] text-white' : 'opacity-[0.03] text-black'}`} />
 
@@ -250,7 +308,7 @@ const BinaryTypewriter = () => {
 
   const [index, setIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
-
+  
   const currentLine = lines[index];
   const characters = "010101110010101!@#$%^&*";
 
@@ -260,9 +318,9 @@ const BinaryTypewriter = () => {
 
     const animateChar = () => {
       if (charIndex <= currentLine.length) {
-        setDisplayText(currentLine.slice(0, charIndex) +
+        setDisplayText(currentLine.slice(0, charIndex) + 
           (charIndex < currentLine.length ? characters[Math.floor(Math.random() * characters.length)] : ""));
-
+        
         if (charIndex === currentLine.length) {
           timeoutId = setTimeout(() => {
             setIndex((prev) => (prev + 1) % lines.length);
@@ -292,6 +350,12 @@ const BinaryTypewriter = () => {
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [activeProject, setActiveProject] = useState<any | null>(null);
+  const [isGridView, setIsGridView] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const scrollPosRef = useRef(0);
+  const isHoveringRef = useRef(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
@@ -354,23 +418,156 @@ export default function App() {
         degree: "Bachelor of Science in Computer Science - Specialization in Intelligent Systems",
         year: "Class of 2027"
       }
+    ],
+    projects: [
+      {
+        title: "AetherConsensus",
+        tag: "DISTRIBUTED SYSTEMS",
+        description: "Autonomous high-performance key-value database built in Rust. Leverages a custom implementation of the Raft consensus protocol and an active WAL disk storage layer to manage cluster synchronization in partition heavy scenarios.",
+        tech: ["Rust", "gRPC", "Protobuf", "Docker"],
+        year: "2024",
+        sourceUrl: "https://github.com/lorenz/aether-consensus",
+        liveUrl: "https://aether-consensus.dev"
+      },
+      {
+        title: "Hyperion Cloud Orchestrator",
+        tag: "PLATFORM ORCHESTRATION",
+        description: "Dynamic visual microservice orchestration dashboard. Hooks directly into Kubernetes APIs via Go hooks to generate sub-millisecond network activity telemetry, node scaling visualizer, and custom cluster threshold triggers.",
+        tech: ["Go", "React.js", "K8s", "Tailwind CSS"],
+        year: "2023",
+        sourceUrl: "https://github.com/lorenz/hyperion-orchestration",
+        liveUrl: "https://hyperion.cloud"
+      },
+      {
+        title: "Synthetica Engine",
+        tag: "MOCK GENERATION",
+        description: "Declarative server-side mocking engine designed to dynamically assemble, map, and output complex nested JSON relational data. Supports direct schema parsing and exposes real-time hot-reloading mock endpoints.",
+        tech: ["Node.js", "TypeScript", "Express", "MongoDB"],
+        year: "2023",
+        sourceUrl: "https://github.com/lorenz/synthetica-engine",
+        liveUrl: "https://synthetica.dev"
+      },
+      {
+        title: "Prism GPU Renderer",
+        tag: "GRAPHICS ENGINEERING",
+        description: "Highly performant web-based Ray Tracing compiler mapping light paths in real-time onto an interactive 3D grid, achieving 60 FPS utilizing native canvas WebGL shaders and optimized vertex structures.",
+        tech: ["JavaScript", "WebGL", "HTML5", "CSS3"],
+        year: "2022",
+        sourceUrl: "https://github.com/lorenz/prism-gpu",
+        liveUrl: "https://prism-grapher.dev"
+      }
     ]
   };
+
+  // Continuous smooth auto-rotation of the carousel with hover pause and seamless modular looping
+  useEffect(() => {
+    if (isGridView) return;
+
+    let animFrame: number;
+    let lastTime = performance.now();
+    const scrollSpeed = 0.05; // px per millisecond
+
+    const tick = (now: number) => {
+      const delta = now - lastTime;
+      lastTime = now;
+
+      if (trackRef.current && !isHoveringRef.current) {
+        scrollPosRef.current -= scrollSpeed * delta;
+
+        // Seamless warp checks
+        const el = trackRef.current;
+        const originalLength = cvData.projects.length;
+        if (el.children && el.children.length > originalLength) {
+          const firstChild = el.children[0] as HTMLElement;
+          const repeatChild = el.children[originalLength] as HTMLElement;
+          if (firstChild && repeatChild) {
+            const loopWidth = repeatChild.offsetLeft - firstChild.offsetLeft;
+            if (loopWidth > 0) {
+              if (Math.abs(scrollPosRef.current) >= loopWidth) {
+                scrollPosRef.current += loopWidth;
+              }
+            }
+          }
+        }
+        el.style.transform = `translate3d(${scrollPosRef.current}px, 0, 0)`;
+      }
+      animFrame = requestAnimationFrame(tick);
+    };
+
+    animFrame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animFrame);
+  }, [isGridView, cvData.projects.length]);
+
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    const el = trackRef.current;
+    if (!el) return;
+    const cardWidth = (el.children[0] as HTMLElement)?.clientWidth || 340;
+    const gap = 32; // gap-8
+    const step = cardWidth + gap;
+
+    const startX = scrollPosRef.current;
+    const targetX = startX + (direction === 'left' ? step : -step);
+    
+    let startTime: number | null = null;
+    const duration = 500; // 500ms smooth transition duration
+
+    isHoveringRef.current = true;
+
+    const animateStep = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      const ease = progress < 0.5 
+        ? 2 * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      scrollPosRef.current = startX + (targetX - startX) * ease;
+      
+      if (el) {
+        const originalLength = cvData.projects.length;
+        const firstChild = el.children[0] as HTMLElement;
+        const repeatChild = el.children[originalLength] as HTMLElement;
+        if (firstChild && repeatChild) {
+          const loopWidth = repeatChild.offsetLeft - firstChild.offsetLeft;
+          if (loopWidth > 0) {
+            if (Math.abs(scrollPosRef.current) >= loopWidth) {
+              scrollPosRef.current += loopWidth;
+            } else if (scrollPosRef.current > 0) {
+              scrollPosRef.current -= loopWidth;
+            }
+          }
+        }
+        el.style.transform = `translate3d(${scrollPosRef.current}px, 0, 0)`;
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animateStep);
+      } else {
+        isHoveringRef.current = false;
+      }
+    };
+
+    requestAnimationFrame(animateStep);
+  };
+
+  const duplicatedProjects = useMemo(() => {
+    return [...cvData.projects, ...cvData.projects, ...cvData.projects, ...cvData.projects];
+  }, [cvData.projects]);
 
   return (
     <div className="relative min-h-screen font-sans">
       <BlackboardBackground isDarkMode={isDarkMode} />
-
+      
       {/* Theme Toggle & Header */}
       <header className="fixed top-0 left-0 w-full p-8 md:p-12 z-50 flex justify-between items-center mix-blend-difference">
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="font-mono font-bold text-lg tracking-[0.2em] text-white uppercase"
         >
           {cvData.name}
         </motion.div>
-        <button
+        <button 
           onClick={() => setIsDarkMode(!isDarkMode)}
           className="p-3 rounded-full hover:bg-white/10 transition-all text-white border border-white/20"
         >
@@ -379,7 +576,7 @@ export default function App() {
       </header>
 
       {/* Expansive Hero Section */}
-      <section className="min-h-[80vh] flex flex-col justify-center p-8 md:p-24 pt-32 md:pt-48 pb-32">
+      <section className="min-h-screen flex flex-col justify-end p-8 md:p-24 pb-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -392,11 +589,11 @@ export default function App() {
           </div>
           <BinaryTypewriter />
           <p className="text-lg md:text-xl max-w-2xl opacity-60 font-light leading-relaxed">
-            I build resilient digital architectures where performance meets logical precision.
+            I build resilient digital architectures where performance meets logical precision. 
             Focused on bridging high-throughput backend services with refined, human-centric interfaces.
           </p>
         </motion.div>
-
+        
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 animate-bounce opacity-30">
           <ArrowDown size={32} />
         </div>
@@ -404,19 +601,17 @@ export default function App() {
 
       {/* Expansive Content Sections */}
       <div className="max-w-7xl mx-auto px-8 md:px-24 space-y-48 pb-64">
-
-        {/* Experience Section - Far more spaced out */}
+        
+        {/* Experience Section */}
         <section id="experience" className="space-y-24 pt-32">
-            <div className="space-y-4">
-              <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
-              <div className="theme-heading-experience text-5xl md:text-8xl font-bold tracking-tighter select-none transition-opacity">
-                WORK EXPERIENCE
-              </div>
-            </div>
+          <div className="space-y-4">
+            <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
+            <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">PREVIOUS_STACKS</div>
+          </div>
 
           <div className="grid grid-cols-1 gap-32">
             {cvData.experience.map((job, i) => (
-              <motion.div
+              <motion.div 
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -475,18 +670,128 @@ export default function App() {
           <div className="flex justify-between items-end">
             <div className="space-y-4">
               <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase">System Core</h2>
-              <div className="theme-heading-architecture text-5xl md:text-9xl font-bold tracking-tighter select-none uppercase transition-opacity">
-                ARCHITECTURE
-              </div>
+              <div className="text-5xl md:text-9xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none uppercase transition-opacity">ARCHITECTURE</div>
             </div>
             <Database size={64} className="opacity-20 hidden md:block" />
           </div>
-
+          
           <div className="flex flex-wrap items-center justify-center gap-12 md:gap-16">
             {cvData.skills.map(skill => (
               <SkillIcon key={skill.name} skill={skill} isDarkMode={isDarkMode} />
             ))}
           </div>
+        </section>
+
+        {/* Projects Section - Place right after ARCHITECTURE section */}
+        <section id="projects" className="space-y-24">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 w-full">
+            <div className="space-y-4">
+              <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Projects</h2>
+              <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">DEPLOYED_BUILD_LOGS</div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              {/* Minimalist Layout View Mode Toggle */}
+              <button
+                onClick={() => setIsGridView(!isGridView)}
+                className={`p-3 rounded-xl border transition-all duration-300 flex items-center justify-center hover:scale-105 active:scale-95
+                  ${isDarkMode 
+                    ? 'border-white/5 bg-white/[0.02] hover:border-blue-500/30 text-blue-500 hover:text-blue-400' 
+                    : 'border-black/5 bg-black/[0.02] hover:border-blue-500/30 text-blue-500 hover:text-blue-600'
+                  }
+                `}
+                title={isGridView ? "Collapse to Slider Mode" : "Expand to Grid Layout (3x3)"}
+                aria-label={isGridView ? "Collapse to Slider Mode" : "Expand to Grid Layout"}
+              >
+                {isGridView ? (
+                  <Minimize2 size={16} />
+                ) : (
+                  <Maximize2 size={16} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {isGridView ? (
+              <motion.div 
+                key="grid-view"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pt-4"
+              >
+                {cvData.projects.map((project, i) => (
+                  <ProjectCard 
+                    key={i} 
+                    project={project} 
+                    isDarkMode={isDarkMode} 
+                    onClick={() => setActiveProject(project)}
+                    isCarousel={false}
+                  />
+                ))}
+              </motion.div>
+            ) : (
+              <div className="relative group/carousel w-full overflow-hidden py-4">
+                {/* Left Floating Chevron Overlay */}
+                <button 
+                  onClick={() => scrollCarousel('left')}
+                  className={`absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full border shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer flex items-center justify-center
+                    opacity-100 md:opacity-0 group-hover/carousel:opacity-100
+                    ${isDarkMode 
+                      ? 'border-white/10 bg-black/60 hover:border-blue-500/50 hover:bg-black/85 text-white/85 hover:text-white' 
+                      : 'border-black/10 bg-white/60 hover:border-blue-500/50 hover:bg-white/85 text-slate-900/85 hover:text-slate-900'
+                    }
+                  `}
+                  style={{ touchAction: 'manipulation' }}
+                  aria-label="Scroll Carousel Left"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                {/* Right Floating Chevron Overlay */}
+                <button 
+                  onClick={() => scrollCarousel('right')}
+                  className={`absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full border shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer flex items-center justify-center
+                    opacity-100 md:opacity-0 group-hover/carousel:opacity-100
+                    ${isDarkMode 
+                      ? 'border-white/10 bg-black/60 hover:border-blue-500/50 hover:bg-black/85 text-white/85 hover:text-white' 
+                      : 'border-black/10 bg-white/60 hover:border-blue-500/50 hover:bg-white/85 text-slate-900/85 hover:text-slate-900'
+                    }
+                  `}
+                  style={{ touchAction: 'manipulation' }}
+                  aria-label="Scroll Carousel Right"
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                {/* Carousel main track container wrapper */}
+                <div 
+                  ref={carouselRef}
+                  onMouseEnter={() => { isHoveringRef.current = true; }}
+                  onMouseLeave={() => { isHoveringRef.current = false; }}
+                  className="w-full relative overflow-hidden select-none cursor-grab active:cursor-grabbing pb-6"
+                >
+                  <div 
+                    ref={trackRef}
+                    className="flex gap-8 w-max transition-transform duration-75 will-change-transform"
+                    style={{ transform: 'translate3d(0px, 0px, 0px)' }}
+                  >
+                    {duplicatedProjects.map((project, i) => (
+                      <ProjectCard 
+                        key={i} 
+                        project={project} 
+                        isDarkMode={isDarkMode} 
+                        onClick={() => setActiveProject(project)}
+                        isCarousel={true}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </AnimatePresence>
         </section>
 
       </div>
@@ -495,8 +800,8 @@ export default function App() {
       <footer className="relative border-t border-white/5 pt-32 pb-64 px-8 md:px-24 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-24">
           <div className="space-y-24">
-            <div className="theme-heading-commence text-7xl md:text-9xl font-bold tracking-tighter select-none leading-none">
-              COMMENCE<br />CONSTRUCTION
+            <div className="text-7xl md:text-9xl font-bold tracking-tighter opacity-15 dark:opacity-10 select-none leading-none">
+              COMMENCE<br/>CONSTRUCTION
             </div>
             <div className="space-y-8">
               <div className="w-12 h-1 bg-blue-500" />
@@ -515,6 +820,102 @@ export default function App() {
           © 2026 Lorenz / System Status: Nominal
         </div>
       </footer>
+
+      {/* Project Specs Detailed Modal */}
+      <AnimatePresence>
+        {activeProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveProject(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/70 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 20, opacity: 0 }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-2xl p-8 md:p-12 rounded-[2.5rem] border relative overflow-hidden shadow-2xl
+                ${isDarkMode 
+                  ? 'bg-[#0f0f0f] border-white/10 text-white shadow-black/80' 
+                  : 'bg-[#f7f7f7] border-black/10 text-slate-900 shadow-slate-300/40'
+                }
+              `}
+            >
+              {/* Close button inside card */}
+              <button 
+                onClick={() => setActiveProject(null)}
+                className={`absolute top-6 right-6 p-2 rounded-full border transition-all duration-300
+                  ${isDarkMode 
+                    ? 'border-white/10 hover:border-white/30 bg-white/5 hover:bg-white/10 text-white' 
+                    : 'border-black/10 hover:border-black/30 bg-black/5 hover:bg-black/10 text-black'
+                  }
+                `}
+              >
+                <X size={18} />
+              </button>
+
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-mono tracking-[0.3em] text-blue-500 uppercase font-extrabold">{activeProject.tag}</span>
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-baseline gap-2">
+                    <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{activeProject.title}</h2>
+                    <span className="text-sm font-mono opacity-40">{activeProject.year}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-mono tracking-widest uppercase opacity-40">Development Blueprint</h4>
+                  <p className="text-base md:text-lg opacity-80 font-light leading-relaxed">
+                    {activeProject.description}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-mono tracking-widest uppercase opacity-40">System Integrations & Stack</h4>
+                  <div className="flex flex-wrap gap-2.5">
+                    {activeProject.tech.map((t: string) => (
+                      <span key={t} className={`text-xs font-mono px-4 py-2 rounded-xl border
+                        ${isDarkMode 
+                          ? 'bg-neutral-900 border-white/5 text-white/80' 
+                          : 'bg-white border-black/5 text-slate-800'
+                        }
+                      `}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`flex gap-6 pt-8 border-t ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+                  {activeProject.sourceUrl && (
+                    <a 
+                      href={activeProject.sourceUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2.5 text-xs font-mono text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider font-extrabold"
+                    >
+                      <Github size={18} /> Source Code
+                    </a>
+                  )}
+                  {activeProject.liveUrl && (
+                    <a 
+                      href={activeProject.liveUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2.5 text-xs font-mono text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider font-extrabold"
+                    >
+                      <ExternalLink size={18} /> Launch Live Demo
+                    </a>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
