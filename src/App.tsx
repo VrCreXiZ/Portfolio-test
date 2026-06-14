@@ -559,7 +559,7 @@ export default function App() {
       <BlackboardBackground isDarkMode={isDarkMode} />
       
       {/* Theme Toggle & Header */}
-      <header className="fixed top-0 left-0 w-full p-8 md:p-12 z-50 flex justify-between items-center mix-blend-difference">
+      <header className="fixed top-0 left-0 w-full py-4 md:py-6 px-8 md:px-12 z-50 flex justify-between items-center mix-blend-difference">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -576,7 +576,7 @@ export default function App() {
       </header>
 
       {/* Expansive Hero Section */}
-      <section className="min-h-screen flex flex-col justify-end p-8 md:p-24 pb-32">
+      <section className="min-h-[70vh] flex flex-col justify-center p-8 md:px-24 pt-20 md:pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
