@@ -624,7 +624,7 @@ export default function App() {
                     <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
                       {job.position}
                     </h3>
-                    <span className="text-xs font-mono px-4 py-2 bg-blue-500/5 border border-blue-500/20 rounded-full tracking-widest uppercase">
+                    <span className="text-xs font-mono px-4 py-2 bg-blue-500/5 border border-blue-500/20 rounded-full tracking-widest uppercase whitespace-nowrap shrink-0">
                       {job.period}
                     </span>
                   </div>
