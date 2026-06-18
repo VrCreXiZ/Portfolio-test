@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef, FC } from 'react';
 import { motion, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
-import { Github, Linkedin, Mail, Binary, Cpu, Database, Layout, Sun, Moon, ArrowDown, ExternalLink, X, Grid, ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
+import { Github, Linkedin, Mail, Binary, Cpu, Database, Layout, Sun, Moon, ArrowDown, ExternalLink, X, Grid, ChevronLeft, ChevronRight, Maximize2, Minimize2, Terminal, Compass, Activity } from 'lucide-react';
 
 // --- Types ---
 interface CVData {
@@ -193,7 +193,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, isDarkMode, onClick, isCar
         <div className="flex justify-between items-start gap-2">
           <div className="space-y-1.5">
             <span className="text-[10px] font-mono tracking-[0.3em] text-blue-500 uppercase font-extrabold">{project.tag}</span>
-            <h3 className="text-2xl md:text-3xl font-bold tracking-tight group-hover:text-blue-500 transition-colors">{project.title}</h3>
+            <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-black dark:text-white group-hover:text-blue-500 transition-colors">{project.title}</h3>
           </div>
           <span className="text-xs font-mono opacity-40 shrink-0">{project.year}</span>
         </div>
@@ -346,6 +346,274 @@ const BinaryTypewriter = () => {
       />
     </div>
   );
+};// --- Systems Dashboard & HUD Target Brackets ---
+
+const TargetSpecHUD = ({ isScanning, scanTargetName, isDarkMode }: { isScanning: boolean; scanTargetName: string; isDarkMode: boolean }) => {
+  return (
+    <AnimatePresence>
+      {isScanning && (
+        <div className="fixed inset-0 pointer-events-none z-[99] overflow-hidden select-none">
+          {/* Extremely elegant screen-wide scanner sweep */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.08 }}
+            exit={{ opacity: 0 }}
+            className={`absolute inset-0 bg-blue-500/5`}
+          />
+
+          {/* Fine target corner ticks */}
+          <motion.div
+            initial={{ x: -20, y: -20, opacity: 0 }}
+            animate={{ x: 12, y: 12, opacity: 0.6 }}
+            exit={{ x: -20, y: -20, opacity: 0 }}
+            className={`absolute left-0 top-0 w-8 h-8 border-l border-t ${isDarkMode ? 'border-blue-400' : 'border-blue-600'}`}
+          />
+          <motion.div
+            initial={{ x: 20, y: -20, opacity: 0 }}
+            animate={{ x: -12, y: 12, opacity: 0.6 }}
+            exit={{ x: 20, y: -20, opacity: 0 }}
+            className={`absolute right-0 top-0 w-8 h-8 border-r border-t ${isDarkMode ? 'border-blue-400' : 'border-blue-600'}`}
+          />
+          <motion.div
+            initial={{ x: -20, y: 20, opacity: 0 }}
+            animate={{ x: 12, y: -12, opacity: 0.6 }}
+            exit={{ x: -20, y: 20, opacity: 0 }}
+            className={`absolute left-0 bottom-0 w-8 h-8 border-l border-b ${isDarkMode ? 'border-blue-400' : 'border-blue-600'}`}
+          />
+          <motion.div
+            initial={{ x: 20, y: 20, opacity: 0 }}
+            animate={{ x: -12, y: -12, opacity: 0.6 }}
+            exit={{ x: 20, y: 20, opacity: 0 }}
+            className={`absolute right-0 bottom-0 w-8 h-8 border-r border-b ${isDarkMode ? 'border-blue-400' : 'border-blue-600'}`}
+          />
+
+          {/* Thin, graceful neon scanning line */}
+          <motion.div
+            initial={{ top: "0%" }}
+            animate={{ top: "100%" }}
+            transition={{ duration: 1.0, ease: "easeInOut" }}
+            className="absolute left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/80 to-transparent shadow-[0_0_8px_rgba(59,130,246,0.5)] z-50 pointer-events-none"
+          />
+
+          {/* Center target circle indicator */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              initial={{ scale: 1.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.08 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className={`w-64 h-64 rounded-full border border-dashed ${isDarkMode ? 'border-blue-400' : 'border-blue-600'}`}
+            />
+            <div className="w-2 h-2 relative flex items-center justify-center">
+              <div className={`absolute w-6 h-[1px] ${isDarkMode ? 'bg-blue-500/30' : 'bg-blue-600/40'}`} />
+              <div className={`absolute h-6 w-[1px] ${isDarkMode ? 'bg-blue-500/30' : 'bg-blue-600/40'}`} />
+            </div>
+          </div>
+
+          {/* Minimalist tactical coordinate overlays */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 0.8, y: 0 }}
+            className="absolute left-8 top-20 font-mono text-left space-y-1 select-none"
+          >
+            <div className={`text-[10px] ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} font-bold tracking-[0.3em]`}>NAV_ALIGNMENT</div>
+            <div className={`text-[8px] ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>DESTINATION: {scanTargetName}</div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 0.8, y: 0 }}
+            className="absolute right-8 bottom-20 font-mono text-right space-y-1 select-none"
+          >
+            <div className={`text-[10px] ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} font-bold tracking-[0.3em]`}>SYS_STATUS</div>
+            <div className={`text-[8px] ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>POSITION_LOCK: SECURED</div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+interface DashboardSection {
+  id: string;
+  num: string;
+  title: string;
+  elementId: string;
+  desc: string;
+}
+
+const DASHBOARD_SECTIONS: DashboardSection[] = [
+  { id: 'hero', num: '01', title: 'WELCOME', elementId: 'hero', desc: 'Main Command Deck' },
+  { id: 'experience', num: '02', title: 'EXPERIENCE', elementId: 'experience', desc: 'Work History Log' },
+  { id: 'bio-segment', num: '03', title: 'BIOGRAPHY', elementId: 'bio-segment', desc: 'Academic Details' },
+  { id: 'architecture-segment', num: '04', title: 'COMPETENCIES', elementId: 'architecture-segment', desc: 'System Competencies' },
+  { id: 'projects', num: '05', title: 'PORTFOLIO', elementId: 'projects', desc: 'Production Registry' },
+  { id: 'footer-segment', num: '06', title: 'CONTACT', elementId: 'footer-segment', desc: 'Outpost Terminus' }
+];
+
+const SleekSystemDashboard = ({
+  isDarkMode,
+  activeSection,
+  scrollProgress,
+  onNavigate
+}: {
+  isDarkMode: boolean;
+  activeSection: string;
+  scrollProgress: number;
+  onNavigate: (elementId: string, title: string) => void;
+}) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [ping, setPing] = useState(14);
+
+  useEffect(() => {
+    const pingInterval = setInterval(() => {
+      setPing(prev => {
+        const delta = Math.floor(Math.random() * 3) - 1;
+        const next = prev + delta;
+        return next < 10 ? 10 : next > 20 ? 20 : next;
+      });
+    }, 4000);
+    return () => clearInterval(pingInterval);
+  }, []);
+
+  return (
+    <>
+      {/* Floating Toggle Hub - Sleek, simplistic, ultra modern */}
+      <div className="fixed bottom-6 right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:right-8 z-40">
+        <AnimatePresence mode="wait">
+          {isCollapsed ? (
+            <motion.button
+              key="trigger-node"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={() => setIsCollapsed(false)}
+              className={`w-12 h-12 rounded-full border flex justify-center items-center backdrop-blur-md shadow-lg hover:shadow-xl transition-all relative group cursor-pointer
+                ${isDarkMode 
+                  ? 'border-neutral-800 bg-neutral-950/90 text-neutral-400 hover:text-white hover:border-neutral-700' 
+                  : 'border-neutral-200 bg-white/90 text-neutral-600 hover:text-black hover:border-neutral-300'
+                }
+              `}
+              title="Expand Navigation Controller"
+            >
+              <svg className="absolute inset-0 w-full h-full -rotate-90">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="21"
+                  className="fill-none stroke-blue-500/20"
+                  strokeWidth="1.5"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="21"
+                  className="fill-none stroke-blue-500"
+                  strokeWidth="1.5"
+                  strokeDasharray="131.9"
+                  strokeDashoffset={131.9 - (131.9 * scrollProgress) / 100}
+                />
+              </svg>
+              <Compass size={18} className="text-blue-500 group-hover:scale-110 transition-transform duration-300" />
+            </motion.button>
+          ) : (
+            <motion.div
+              key="hud-panel"
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`w-[240px] md:w-[260px] border backdrop-blur-md rounded-[1.5rem] p-5 shadow-xl flex flex-col gap-4 relative overflow-hidden
+                ${isDarkMode 
+                  ? 'border-neutral-800 bg-neutral-950/95 text-neutral-250 shadow-black/50' 
+                  : 'border-neutral-200 bg-white/95 text-neutral-800 shadow-neutral-200/50'
+                }
+              `}
+            >
+              <div className="absolute inset-0 grid-pattern opacity-[0.01] pointer-events-none" />
+
+              {/* Console Header */}
+              <div className="flex justify-between items-center border-b border-neutral-500/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                  </div>
+                  <div>
+                    <h4 className="text-[9px] font-mono font-medium tracking-[0.25em] text-blue-500 uppercase">SYS_COORD</h4>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsCollapsed(true)}
+                  className={`text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border transition-all
+                    ${isDarkMode 
+                      ? 'border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white' 
+                      : 'border-neutral-200 hover:border-neutral-300 text-neutral-500 hover:text-black'
+                    }
+                  `}
+                >
+                  Hide
+                </button>
+              </div>
+
+              {/* Simplistic Indicator */}
+              <div className="flex justify-between items-center font-mono text-[9px] px-1 py-1">
+                <div className="flex flex-col gap-0.5">
+                  <span className="opacity-40 uppercase">ACTIVE_DECK</span>
+                  <span className="font-bold text-blue-500 tracking-wider">
+                    {DASHBOARD_SECTIONS.find(s => s.id === activeSection)?.title || 'WELCOME'}
+                  </span>
+                </div>
+                <div className="text-right flex flex-col gap-0.5">
+                  <span className="opacity-40 uppercase">LATENCY</span>
+                  <span className="opacity-80 font-medium">{ping}MS</span>
+                </div>
+              </div>
+
+              {/* Navigation Grid Nodes */}
+              <div className="flex flex-col gap-1 mt-1">
+                {DASHBOARD_SECTIONS.map((sec) => {
+                  const isActive = activeSection === sec.id;
+                  return (
+                    <button
+                      key={sec.id}
+                      onClick={() => onNavigate(sec.elementId, sec.title)}
+                      className={`w-full py-1.5 px-3 rounded-lg font-mono text-left text-[11px] transition-all relative flex justify-between items-center group/node
+                        ${isActive 
+                          ? 'bg-blue-500/5 text-blue-500 font-medium border border-blue-500/20' 
+                          : isDarkMode
+                            ? 'border border-transparent text-neutral-400 hover:text-white hover:bg-neutral-900/30' 
+                            : 'border border-transparent text-neutral-600 hover:text-black hover:bg-neutral-100/40'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[8px] tracking-normal ${isActive ? 'text-blue-500' : 'opacity-40'}`}>
+                          {sec.num}
+                        </span>
+                        <span className="tracking-widest uppercase">{sec.title}</span>
+                      </div>
+
+                      {isActive && (
+                        <motion.span 
+                          layoutId="active-dot"
+                          className="w-1 h-1 rounded-full bg-blue-500" 
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="pt-2 border-t border-neutral-500/10 flex justify-between text-[8px] font-mono opacity-30 mt-1">
+                <span>VER: 2.1.0</span>
+                <span>HUD NAVIGATION</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  );
 };
 
 export default function App() {
@@ -356,6 +624,53 @@ export default function App() {
   const trackRef = useRef<HTMLDivElement>(null);
   const scrollPosRef = useRef(0);
   const isHoveringRef = useRef(false);
+
+  // Spying navigation states
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanTargetName, setScanTargetName] = useState("");
+  const [activeSection, setActiveSection] = useState("hero");
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        setScrollProgress((window.scrollY / totalHeight) * 100);
+      }
+
+      const sections = ['hero', 'experience', 'bio-segment', 'architecture-segment', 'projects', 'footer-segment'];
+      let currentSection = 'hero';
+      
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.45) {
+            currentSection = sectionId;
+          }
+        }
+      }
+      setActiveSection(currentSection);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleNavigate = (elementId: string, title: string) => {
+    const el = document.getElementById(elementId);
+    if (el) {
+      setIsScanning(true);
+      setScanTargetName(title);
+      
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      setTimeout(() => {
+        setIsScanning(false);
+      }, 1200);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
@@ -558,6 +873,21 @@ export default function App() {
     <div className="relative min-h-screen font-sans">
       <BlackboardBackground isDarkMode={isDarkMode} />
       
+      {/* Target Spec Tactical Scan HUD Overlay */}
+      <TargetSpecHUD
+        isScanning={isScanning}
+        scanTargetName={scanTargetName}
+        isDarkMode={isDarkMode}
+      />
+
+      {/* Dynamic Systems Control Dashboard */}
+      <SleekSystemDashboard
+        isDarkMode={isDarkMode}
+        activeSection={activeSection}
+        scrollProgress={scrollProgress}
+        onNavigate={handleNavigate}
+      />
+      
       {/* Theme Toggle & Header */}
       <header className="fixed top-0 left-0 w-full py-4 md:py-6 px-8 md:px-12 z-50 flex justify-between items-center mix-blend-difference">
         <motion.div 
@@ -576,7 +906,7 @@ export default function App() {
       </header>
 
       {/* Expansive Hero Section */}
-      <section className="min-h-[70vh] flex flex-col justify-center p-8 md:px-24 pt-20 md:pt-24 pb-12">
+      <section id="hero" className="min-h-[70vh] flex flex-col justify-center p-8 md:px-24 pt-20 md:pt-24 pb-12 relative scroll-mt-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -603,10 +933,10 @@ export default function App() {
       <div className="max-w-7xl mx-auto px-8 md:px-24 space-y-48 pb-64">
         
         {/* Experience Section */}
-        <section id="experience" className="space-y-24 pt-32">
+        <section id="experience" className="space-y-24 pt-32 scroll-mt-32">
           <div className="space-y-4">
             <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Exp. Log</h2>
-            <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">PREVIOUS_STACKS</div>
+            <div className="text-5xl md:text-8xl font-bold tracking-tighter text-black dark:text-white select-none transition-opacity">PREVIOUS_STACKS</div>
           </div>
 
           <div className="grid grid-cols-1 gap-32">
@@ -621,7 +951,7 @@ export default function App() {
                 <div className="absolute -left-12 top-0 h-full w-[2px] bg-blue-500/10 group-hover:bg-blue-500/40 transition-all duration-700" />
                 <div className="space-y-8 max-w-3xl">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
+                    <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-black dark:text-white">
                       {job.position}
                     </h3>
                     <span className="text-xs font-mono px-4 py-2 bg-blue-500/5 border border-blue-500/20 rounded-full tracking-widest uppercase whitespace-nowrap shrink-0">
@@ -639,11 +969,11 @@ export default function App() {
         </section>
 
         {/* Dynamic Grid: Bio & Education */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-start">
+        <section id="bio-segment" className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-start scroll-mt-32">
           <div className="space-y-12">
             <div className="space-y-4">
               <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase">The Objective</h2>
-              <h3 className="text-4xl font-bold tracking-tight">Engineering for Scale.</h3>
+              <h3 className="text-4xl font-bold tracking-tight text-black dark:text-white">Engineering for Scale.</h3>
             </div>
             <p className="text-lg opacity-60 font-light leading-relaxed">
               I specialize in complex system integration, developing distributed services that handle millions of requests while ensuring a flawless developer experience. My approach is rooted in the philosophy that software should be as resilient as it is intuitive.
@@ -657,7 +987,7 @@ export default function App() {
             </div>
             {cvData.education.map((edu, i) => (
               <div key={i} className="space-y-4">
-                <p className="text-2xl font-bold tracking-tight">{edu.degree}</p>
+                <p className="text-2xl font-bold tracking-tight text-black dark:text-white">{edu.degree}</p>
                 <p className="text-lg opacity-60 font-light">{edu.institution}</p>
                 <p className="text-[10px] font-mono tracking-[0.4em] uppercase opacity-30">{edu.year}</p>
               </div>
@@ -666,11 +996,11 @@ export default function App() {
         </section>
 
         {/* Skills Section - Unified ARCHITECTURE Segment */}
-        <section className="space-y-32">
+        <section id="architecture-segment" className="space-y-32 scroll-mt-32">
           <div className="flex justify-between items-end">
             <div className="space-y-4">
               <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase">System Core</h2>
-              <div className="text-5xl md:text-9xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none uppercase transition-opacity">ARCHITECTURE</div>
+              <div className="text-5xl md:text-9xl font-bold tracking-tighter text-black dark:text-white select-none uppercase transition-opacity">ARCHITECTURE</div>
             </div>
             <Database size={64} className="opacity-20 hidden md:block" />
           </div>
@@ -683,11 +1013,11 @@ export default function App() {
         </section>
 
         {/* Projects Section - Place right after ARCHITECTURE section */}
-        <section id="projects" className="space-y-24">
+        <section id="projects" className="space-y-24 scroll-mt-32">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 w-full">
             <div className="space-y-4">
               <h2 className="text-xs font-mono tracking-[0.5em] text-blue-500 font-bold uppercase underline underline-offset-8">Projects</h2>
-              <div className="text-5xl md:text-8xl font-bold tracking-tighter opacity-25 dark:opacity-20 select-none transition-opacity">DEPLOYED_BUILD_LOGS</div>
+              <div className="text-5xl md:text-8xl font-bold tracking-tighter text-black dark:text-white select-none transition-opacity">PORTFOLIO</div>
             </div>
             
             <div className="flex items-center gap-3">
@@ -797,10 +1127,10 @@ export default function App() {
       </div>
 
       {/* Expansive Footer */}
-      <footer className="relative border-t border-white/5 pt-32 pb-64 px-8 md:px-24 overflow-hidden">
+      <footer id="footer-segment" className="relative border-t border-white/5 pt-32 pb-64 px-8 md:px-24 overflow-hidden scroll-mt-32">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-24">
           <div className="space-y-24">
-            <div className="text-7xl md:text-9xl font-bold tracking-tighter opacity-15 dark:opacity-10 select-none leading-none">
+            <div className="text-7xl md:text-9xl font-bold tracking-tighter text-black dark:text-white select-none leading-none">
               COMMENCE<br/>CONSTRUCTION
             </div>
             <div className="space-y-8">
