@@ -616,6 +616,125 @@ const SleekSystemDashboard = ({
   );
 };
 
+const SlayerLogo = ({ size = 32, className = "" }: { size?: number; className?: string }) => {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      className={`${className} overflow-visible`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Outer Circle Ring */}
+      <circle
+        cx="50"
+        cy="50"
+        r="44"
+        className="stroke-blue-500/10 dark:stroke-blue-500/5"
+        strokeWidth="1"
+        strokeDasharray="4 8"
+      />
+      
+      {/* Outer bracket points */}
+      <path d="M 45 6 L 50 2 L 55 6" className="stroke-blue-500/40" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M 45 94 L 50 98 L 55 94" className="stroke-blue-500/40" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+      
+      {/* Left Horn path */}
+      <motion.path
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.9 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+        d="M 24 22 L 18 44 L 28 66 L 43 78 L 41 72 L 31 61 L 22 43 L 28 22 Z"
+        className="stroke-blue-500 dark:stroke-blue-400 fill-blue-500/5 dark:fill-blue-500/10"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* Right Horn path */}
+      <motion.path
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.9 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+        d="M 76 22 L 82 44 L 72 66 L 57 78 L 59 72 L 69 61 L 78 43 L 72 22 Z"
+        className="stroke-blue-500 dark:stroke-blue-400 fill-blue-500/5 dark:fill-blue-500/10"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* Symmetric Left Wing Inner */}
+      <motion.path
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.8 }}
+        transition={{ duration: 1.3, ease: "easeInOut", delay: 0.2 }}
+        d="M 34 32 L 28 46 L 35 58 L 45 64 L 41 58 L 34 50 L 38 32 Z"
+        className="stroke-blue-500/80 dark:stroke-blue-400/80 fill-blue-500/5 dark:fill-blue-500/5"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+
+      {/* Symmetric Right Wing Inner */}
+      <motion.path
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.8 }}
+        transition={{ duration: 1.3, ease: "easeInOut", delay: 0.2 }}
+        d="M 66 32 L 72 46 L 65 58 L 55 64 L 59 58 L 66 50 L 62 32 Z"
+        className="stroke-blue-500/80 dark:stroke-blue-400/80 fill-blue-500/5 dark:fill-blue-500/5"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+
+      {/* Center Sword Blade */}
+      <motion.path
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeInOut", delay: 0.4 }}
+        d="M 50 14 L 45 22 L 47 34 L 47 70 L 50 84 L 53 70 L 53 34 L 55 22 Z"
+        className="stroke-blue-500 dark:stroke-blue-400 fill-blue-500/10 dark:fill-blue-500/20"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+
+      {/* Sword Guard */}
+      <motion.path
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 1.0, ease: "easeOut", delay: 0.6 }}
+        style={{ transformOrigin: "center" }}
+        d="M 28 34 L 72 34 L 62 40 L 38 40 Z"
+        className="stroke-blue-500/90 dark:stroke-blue-400 fill-blue-500/20 dark:fill-blue-400/25"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* Top Diamond */}
+      <motion.path
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, delay: 0.8 }}
+        d="M 50 4 L 54 8 L 50 12 L 46 8 Z"
+        className="fill-blue-500 stroke-blue-500"
+        strokeWidth="1"
+      />
+
+      {/* Crossbar */}
+      <motion.line
+        initial={{ x1: 50, x2: 50 }}
+        animate={{ x1: 38, x2: 62 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        y1="56"
+        y2="56"
+        className="stroke-blue-500 dark:stroke-blue-400"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* Internal Grid Guide */}
+      <line x1="50" y1="28" x2="50" y2="60" className="stroke-blue-500/45 dark:stroke-blue-400/45" strokeWidth="1" strokeDasharray="2 3" />
+    </svg>
+  );
+};
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeProject, setActiveProject] = useState<any | null>(null);
@@ -891,11 +1010,14 @@ export default function App() {
       {/* Theme Toggle & Header */}
       <header className="fixed top-0 left-0 w-full py-4 md:py-6 px-8 md:px-12 z-50 flex justify-between items-center mix-blend-difference">
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="font-mono font-bold text-lg tracking-[0.2em] text-white uppercase"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-3.5"
         >
-          {cvData.name}
+          <SlayerLogo size={28} className="text-white hover:scale-110 hover:rotate-12 transition-all duration-300" />
+          <span className="font-mono font-bold text-lg tracking-[0.2em] text-white uppercase">
+            {cvData.name}
+          </span>
         </motion.div>
         <button 
           onClick={() => setIsDarkMode(!isDarkMode)}
@@ -914,7 +1036,11 @@ export default function App() {
           className="space-y-12"
         >
           <div className="flex items-center gap-6">
-            <div className="w-16 h-[2px] bg-blue-500" />
+            <div className="relative group/logo">
+              <SlayerLogo size={52} className="text-blue-500 hover:scale-110 transition-transform duration-300 cursor-pointer" />
+              <div className="absolute -inset-2 bg-blue-500/20 rounded-full blur opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300" />
+            </div>
+            <div className="w-12 h-[2px] bg-blue-500" />
             <span className="text-xs font-mono tracking-[0.5em] opacity-40 uppercase">{cvData.role}</span>
           </div>
           <BinaryTypewriter />
