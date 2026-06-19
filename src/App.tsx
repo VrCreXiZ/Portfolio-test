@@ -735,7 +735,214 @@ const SlayerLogo = ({ size = 32, className = "" }: { size?: number; className?: 
   );
 };
 
+interface ModernGateLoaderProps {
+  onComplete: () => void;
+}
+
+const ModernGateLoader: FC<ModernGateLoaderProps> = ({ onComplete }) => {
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("CONNECTING LINK...");
+
+  useEffect(() => {
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      const increment = Math.floor(Math.random() * 8) + 4;
+      currentProgress = Math.min(currentProgress + increment, 100);
+      setProgress(currentProgress);
+
+      if (currentProgress < 15) {
+        setStatus("INITIALIZING PORTAL PROTOCOLS...");
+      } else if (currentProgress < 35) {
+        setStatus("COMPILING SLAYER VECTOR GRAPHICS...");
+      } else if (currentProgress < 60) {
+        setStatus("SYNCING SYSTEM CORE ARCHITECTURE...");
+      } else if (currentProgress < 85) {
+        setStatus("DECRYPTING PORTFOLIO BLUEPRINTS...");
+      } else if (currentProgress < 100) {
+        setStatus("ENGAGING SYMMETRIC LOGIC GATES...");
+      } else {
+        setStatus("GATEWAY DEC_DECRYPTED. ENTER PORTAL.");
+        clearInterval(interval);
+        setTimeout(() => {
+          onComplete();
+        }, 600);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [onComplete]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[9999] overflow-hidden flex select-none"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+    >
+      {/* Left Gate Panel */}
+      <motion.div
+        className="w-1/2 h-full bg-[#07090e] border-r border-blue-500/5 flex flex-col justify-between p-8 md:p-16 relative overflow-hidden"
+        initial={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,rgba(59,130,246,0.02)_0%,transparent_70%)] pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
+        
+        {/* Detail indicators */}
+        <div className="font-mono text-[9px] text-blue-500/40 space-y-1.5 z-10">
+          <div className="tracking-[0.15em]">CORE_MODULE_BOOT // ENGAGED</div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-blue-500 animate-pulse rounded-full" />
+            <span className="tracking-wider">STATUS: DECRYPTING</span>
+          </div>
+        </div>
+
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-24 opacity-[0.015] dark:opacity-[0.01] text-white pointer-events-none font-bold text-[18vw] tracking-tighter leading-none select-none">
+          SLAYER
+        </div>
+
+        <div className="font-mono text-[9px] tracking-[0.25em] text-blue-500/40 uppercase z-10">
+          LOGIC_GATE // LEFT_SEC
+        </div>
+      </motion.div>
+
+      {/* Right Gate Panel */}
+      <motion.div
+        className="w-1/2 h-full bg-[#07090e] flex flex-col justify-between p-8 md:p-16 relative overflow-hidden"
+        initial={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_right_center,rgba(59,130,246,0.02)_0%,transparent_70%)] pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
+        
+        {/* Detail indicators */}
+        <div className="font-mono text-[9px] text-blue-500/40 text-right space-y-1.5 z-10">
+          <div className="tracking-[0.15em]">SEC_SYS_V4 // DEPLOYMENT_LOGS</div>
+          <div className="tracking-wider">LATENCY: 4.88ms // SECURE</div>
+        </div>
+
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-24 opacity-[0.015] dark:opacity-[0.01] text-white pointer-events-none font-bold text-[18vw] tracking-tighter leading-none select-none">
+          GATEWAY
+        </div>
+
+        <div className="font-mono text-[9px] tracking-[0.25em] text-blue-500/40 text-right uppercase z-10">
+          SYSTEM_OS // RIGHT_SEC
+        </div>
+      </motion.div>
+
+      {/* Midline Glowing Seam Indicator */}
+      <motion.div 
+        className="absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 bg-blue-500/40 z-20 pointer-events-none shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+        exit={{ scaleY: 0, opacity: 0 }}
+        transition={{ duration: 0.6, ease: "easeIn" }}
+      />
+
+      {/* Central Turning Circle & HUD */}
+      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none">
+        <div className="relative flex items-center justify-center">
+          {/* Centered Ring Base */}
+          <motion.div
+            className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-[#07090e]/95 border border-blue-500/15 shadow-[0_0_60px_rgba(59,130,246,0.12)] flex items-center justify-center backdrop-blur-md relative"
+            exit={{ scale: 0.2, opacity: 0, filter: "blur(10px)" }}
+            transition={{ duration: 0.8, ease: "easeIn" }}
+          >
+            {/* Outer Slow Clockwise Rotating Vector */}
+            <svg className="absolute w-full h-full animate-[spin_16s_linear_infinite]" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="46"
+                className="stroke-blue-500/20"
+                strokeWidth="1.2"
+                fill="none"
+                strokeDasharray="8 16 24 16"
+              />
+            </svg>
+
+            {/* Inner Thin Counter-Clockwise Spinning Circle */}
+            <svg className="absolute w-[90%] h-[90%] animate-[spin_8s_linear_infinite_reverse]" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                className="stroke-blue-500/40"
+                strokeWidth="0.8"
+                fill="none"
+                strokeDasharray="2 6"
+              />
+            </svg>
+
+            {/* Glowing active loading trace */}
+            <svg className="absolute w-[94%] h-[94%] -rotate-90" viewBox="0 0 100 100">
+              <motion.circle
+                cx="50"
+                cy="50"
+                r="44"
+                className="stroke-blue-500"
+                strokeWidth="2.2"
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 44}`}
+                strokeDashoffset={`${2 * Math.PI * 44 * (1 - progress / 100)}`}
+                style={{ filter: "drop-shadow(0 0 6px rgba(59, 130, 246, 0.75))" }}
+              />
+            </svg>
+
+            {/* Middle Rotating Slayer's Mark Logo */}
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <motion.div
+                className="w-full h-full flex items-center justify-center text-blue-500/90"
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+              >
+                <SlayerLogo size={70} />
+              </motion.div>
+            </div>
+
+            {/* Centered Digital Countdown Percent */}
+            <div className="absolute bottom-8 text-center bg-black/40 px-2 py-0.5 rounded border border-blue-500/10 backdrop-blur-sm">
+              <div className="font-mono text-[10px] tracking-widest text-blue-400 font-bold">
+                {Math.round(progress)}%
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Dynamic loading logs / Skip utility */}
+        <motion.div
+          className="mt-8 flex flex-col items-center space-y-3 select-none"
+          exit={{ opacity: 0, y: 15 }}
+          transition={{ duration: 0.6, ease: "easeIn" }}
+        >
+          {/* Cyber bracket log */}
+          <div className="font-mono text-[10px] md:text-xs text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="opacity-30">&lt;</span>
+            <span className="font-bold">{status}</span>
+            <span className="opacity-30">&gt;</span>
+          </div>
+
+          <div className="font-mono text-[8px] text-blue-500/30 uppercase tracking-[0.15em]">
+            GATEWAY_SYSTEM_INTEGRITY: {(progress >= 100) ? "VERIFIED" : "LOADING_RESOURCES"}
+          </div>
+
+          {/* Quick Skip Button for extreme UI/UX fluidity */}
+          {progress > 10 && (
+            <button
+              onClick={onComplete}
+              className="mt-2 pointer-events-auto text-[9px] font-mono tracking-[0.3em] font-bold text-blue-500/60 hover:text-blue-400 uppercase px-6 py-2 border border-blue-500/10 hover:border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 rounded-full transition-all duration-300 backdrop-blur-md shadow-lg cursor-pointer"
+            >
+              Bypass Gateway
+            </button>
+          )}
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
 export default function App() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeProject, setActiveProject] = useState<any | null>(null);
   const [isGridView, setIsGridView] = useState(false);
@@ -749,6 +956,17 @@ export default function App() {
   const [scanTargetName, setScanTargetName] = useState("");
   const [activeSection, setActiveSection] = useState("hero");
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isLoaded]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -893,6 +1111,150 @@ export default function App() {
     ]
   };
 
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollPosRef = useRef(0);
+
+  // Helper to determine the card closest to the horizontal center of the carousel container
+  const getClosestCardIndex = () => {
+    const el = trackRef.current;
+    const container = carouselRef.current;
+    if (!el || !container) return 0;
+
+    const containerWidth = container.clientWidth;
+    const centerTarget = containerWidth / 2;
+
+    const children = Array.from(el.children) as HTMLElement[];
+    if (children.length === 0) return 0;
+
+    let closestChildIndex = 0;
+    let minDistance = Infinity;
+
+    children.forEach((child, idx) => {
+      const cardWidth = child.clientWidth;
+      const childCenterInTrack = child.offsetLeft + cardWidth / 2;
+      const childCenterCurrent = scrollPosRef.current + childCenterInTrack;
+      const distance = Math.abs(childCenterCurrent - centerTarget);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestChildIndex = idx;
+      }
+    });
+
+    return closestChildIndex;
+  };
+
+  // Smoothly snaps and scrolls the track so that targetIdx aligns exactly to the container's center
+  const scrollToCardIndex = (targetIdx: number, duration = 400) => {
+    const el = trackRef.current;
+    const container = carouselRef.current;
+    if (!el || !container) return;
+
+    const children = Array.from(el.children) as HTMLElement[];
+    if (children.length === 0) return;
+
+    // Constrain within real bounds
+    const safeIdx = Math.max(0, Math.min(targetIdx, children.length - 1));
+    const child = children[safeIdx];
+    const containerWidth = container.clientWidth;
+    const centerTarget = containerWidth / 2;
+    const cardWidth = child.clientWidth;
+    const childCenterInTrack = child.offsetLeft + cardWidth / 2;
+    const targetX = centerTarget - childCenterInTrack;
+
+    const startX = scrollPosRef.current;
+    let startTime: number | null = null;
+    isHoveringRef.current = true; // Prevent automatic kinetic drifting during manual scroll
+
+    const animateScroll = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      // Luxurious easeOutQuart transition speed profile
+      const ease = 1 - Math.pow(1 - progress, 4);
+
+      scrollPosRef.current = startX + (targetX - startX) * ease;
+
+      // Handle modular infinite looping
+      const originalLength = cvData.projects.length;
+      const firstChild = el.children[0] as HTMLElement;
+      const repeatChild = el.children[originalLength] as HTMLElement;
+      if (firstChild && repeatChild) {
+        const loopWidth = repeatChild.offsetLeft - firstChild.offsetLeft;
+        if (loopWidth > 0) {
+          if (Math.abs(scrollPosRef.current) >= loopWidth) {
+            scrollPosRef.current += loopWidth;
+          } else if (scrollPosRef.current > 0) {
+            scrollPosRef.current -= loopWidth;
+          }
+        }
+      }
+
+      el.style.transform = `translate3d(${scrollPosRef.current}px, 0, 0)`;
+
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      } else {
+        isHoveringRef.current = false;
+      }
+    };
+
+    requestAnimationFrame(animateScroll);
+  };
+
+  const snapToNearest = () => {
+    const closestIdx = getClosestCardIndex();
+    scrollToCardIndex(closestIdx, 400);
+  };
+
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    const currentIdx = getClosestCardIndex();
+    const targetIdx = direction === 'left' ? currentIdx - 1 : currentIdx + 1;
+    scrollToCardIndex(targetIdx, 500);
+  };
+
+  const handleDragStart = (clientX: number) => {
+    if (isGridView) return;
+    isDraggingRef.current = true;
+    isHoveringRef.current = true;
+    dragStartXRef.current = clientX;
+    dragStartScrollPosRef.current = scrollPosRef.current;
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDraggingRef.current || isGridView) return;
+    const deltaX = clientX - dragStartXRef.current;
+    scrollPosRef.current = dragStartScrollPosRef.current + deltaX;
+
+    const el = trackRef.current;
+    if (el) {
+      // Direct drag loop wraps
+      const originalLength = cvData.projects.length;
+      const firstChild = el.children[0] as HTMLElement;
+      const repeatChild = el.children[originalLength] as HTMLElement;
+      if (firstChild && repeatChild) {
+        const loopWidth = repeatChild.offsetLeft - firstChild.offsetLeft;
+        if (loopWidth > 0) {
+          if (Math.abs(scrollPosRef.current) >= loopWidth) {
+            scrollPosRef.current += loopWidth;
+            dragStartXRef.current += loopWidth; // shift start reference to keep drag absolute delta linear
+          } else if (scrollPosRef.current > 0) {
+            scrollPosRef.current -= loopWidth;
+            dragStartXRef.current -= loopWidth;
+          }
+        }
+      }
+      el.style.transform = `translate3d(${scrollPosRef.current}px, 0, 0)`;
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    snapToNearest();
+  };
+
   // Continuous smooth auto-rotation of the carousel with hover pause and seamless modular looping
   useEffect(() => {
     if (isGridView) return;
@@ -905,7 +1267,7 @@ export default function App() {
       const delta = now - lastTime;
       lastTime = now;
 
-      if (trackRef.current && !isHoveringRef.current) {
+      if (trackRef.current && !isHoveringRef.current && !isDraggingRef.current) {
         scrollPosRef.current -= scrollSpeed * delta;
 
         // Seamless warp checks
@@ -932,64 +1294,18 @@ export default function App() {
     return () => cancelAnimationFrame(animFrame);
   }, [isGridView, cvData.projects.length]);
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    const el = trackRef.current;
-    if (!el) return;
-    const cardWidth = (el.children[0] as HTMLElement)?.clientWidth || 340;
-    const gap = 32; // gap-8
-    const step = cardWidth + gap;
-
-    const startX = scrollPosRef.current;
-    const targetX = startX + (direction === 'left' ? step : -step);
-    
-    let startTime: number | null = null;
-    const duration = 500; // 500ms smooth transition duration
-
-    isHoveringRef.current = true;
-
-    const animateStep = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      
-      const ease = progress < 0.5 
-        ? 2 * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-      scrollPosRef.current = startX + (targetX - startX) * ease;
-      
-      if (el) {
-        const originalLength = cvData.projects.length;
-        const firstChild = el.children[0] as HTMLElement;
-        const repeatChild = el.children[originalLength] as HTMLElement;
-        if (firstChild && repeatChild) {
-          const loopWidth = repeatChild.offsetLeft - firstChild.offsetLeft;
-          if (loopWidth > 0) {
-            if (Math.abs(scrollPosRef.current) >= loopWidth) {
-              scrollPosRef.current += loopWidth;
-            } else if (scrollPosRef.current > 0) {
-              scrollPosRef.current -= loopWidth;
-            }
-          }
-        }
-        el.style.transform = `translate3d(${scrollPosRef.current}px, 0, 0)`;
-      }
-
-      if (progress < 1) {
-        requestAnimationFrame(animateStep);
-      } else {
-        isHoveringRef.current = false;
-      }
-    };
-
-    requestAnimationFrame(animateStep);
-  };
-
   const duplicatedProjects = useMemo(() => {
     return [...cvData.projects, ...cvData.projects, ...cvData.projects, ...cvData.projects];
   }, [cvData.projects]);
 
   return (
     <div className="relative min-h-screen font-sans">
+      <AnimatePresence mode="wait">
+        {!isLoaded && (
+          <ModernGateLoader key="gate-loader" onComplete={() => setIsLoaded(true)} />
+        )}
+      </AnimatePresence>
+
       <BlackboardBackground isDarkMode={isDarkMode} />
       
       {/* Target Spec Tactical Scan HUD Overlay */}
@@ -1011,7 +1327,8 @@ export default function App() {
       <header className="fixed top-0 left-0 w-full py-4 md:py-6 px-8 md:px-12 z-50 flex justify-between items-center mix-blend-difference">
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={isLoaded ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="flex items-center gap-3.5"
         >
           <SlayerLogo size={28} className="text-white hover:scale-110 hover:rotate-12 transition-all duration-300" />
@@ -1031,8 +1348,8 @@ export default function App() {
       <section id="hero" className="min-h-[70vh] flex flex-col justify-center p-8 md:px-24 pt-20 md:pt-24 pb-12 relative scroll-mt-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 1, delay: 0.4 }}
           className="space-y-12"
         >
           <div className="flex items-center gap-6">
@@ -1222,11 +1539,25 @@ export default function App() {
                   <ChevronRight size={20} />
                 </button>
 
-                {/* Carousel main track container wrapper */}
+                 {/* Carousel main track container wrapper */}
                 <div 
                   ref={carouselRef}
                   onMouseEnter={() => { isHoveringRef.current = true; }}
-                  onMouseLeave={() => { isHoveringRef.current = false; }}
+                  onMouseLeave={() => { 
+                    isHoveringRef.current = false; 
+                    if (isDraggingRef.current) handleDragEnd(); 
+                  }}
+                  onMouseDown={(e) => handleDragStart(e.clientX)}
+                  onMouseMove={(e) => handleDragMove(e.clientX)}
+                  onMouseUp={handleDragEnd}
+                  onTouchStart={(e) => { 
+                    if (e.touches[0]) handleDragStart(e.touches[0].clientX); 
+                  }}
+                  onTouchMove={(e) => { 
+                    if (e.touches[0]) handleDragMove(e.touches[0].clientX); 
+                  }}
+                  onTouchEnd={handleDragEnd}
+                  onTouchCancel={handleDragEnd}
                   className="w-full relative overflow-hidden select-none cursor-grab active:cursor-grabbing pb-6"
                 >
                   <div 
