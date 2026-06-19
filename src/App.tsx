@@ -1111,6 +1111,24 @@ export default function App() {
     ]
   };
 
+  useEffect(() => {
+    // Dynamically set page title matching user portfolio spec
+    document.title = `${cvData.name} | ${cvData.role}`;
+
+    // Dynamically inject matching Slayer Logo SVG as the window tab favicon icon
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="44" stroke="%233b82f6" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.35"/><path d="M 45 6 L 50 2 L 55 6" stroke="%233b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="M 45 94 L 50 98 L 55 94" stroke="%233b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="M 24 22 L 18 44 L 28 66 L 43 78 L 41 72 L 31 61 L 22 43 L 28 22 Z" stroke="%233b82f6" stroke-width="1.8" fill="rgba(59,130,246,0.15)" stroke-linejoin="round"/><path d="M 76 22 L 82 44 L 72 66 L 57 78 L 59 72 L 69 61 L 78 43 L 72 22 Z" stroke="%233b82f6" stroke-width="1.8" fill="rgba(59,130,246,0.15)" stroke-linejoin="round"/><path d="M 34 32 L 28 46 L 35 58 L 45 64 L 41 58 L 34 50 L 38 32 Z" stroke="%233b82f6" stroke-width="1.2" fill="rgba(59,130,246,0.08)" stroke-linejoin="round" opacity="0.8"/><path d="M 66 32 L 72 46 L 65 58 L 55 64 L 59 58 L 66 50 L 62 32 Z" stroke="%233b82f6" stroke-width="1.2" fill="rgba(59,130,246,0.08)" stroke-linejoin="round" opacity="0.8"/><path d="M 50 14 L 45 22 L 47 34 L 47 70 L 50 84 L 53 70 L 53 34 L 55 22 Z" stroke="%233b82f6" stroke-width="2" fill="rgba(59,130,246,0.25)" stroke-linejoin="round"/><path d="M 28 34 L 72 34 L 62 40 L 38 40 Z" stroke="%233b82f6" stroke-width="1.6" fill="rgba(59,130,246,0.3)" stroke-linejoin="round"/><path d="M 50 4 L 54 8 L 50 12 L 46 8 Z" fill="%233b82f6" stroke="%233b82f6" stroke-width="1"/><line x1="38" y1="56" x2="62" y2="56" stroke="%233b82f6" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="28" x2="50" y2="60" stroke="rgba(59,130,246,0.5)" stroke-width="1" stroke-dasharray="2 3"/></svg>`;
+    const faviconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`;
+    
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+    link.type = 'image/svg+xml';
+    link.href = faviconUrl;
+  }, [cvData.name, cvData.role]);
+
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragStartScrollPosRef = useRef(0);
